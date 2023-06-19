@@ -1,0 +1,57 @@
+
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from init import *
+from pre import *
+
+dump = np.load('dump.npy', allow_pickle=True).item()
+
+xs = dump['x']
+ys = dump['y']
+ws = dump['w']
+
+x = xs[3]
+y = ys[3]
+f = ws[3]
+
+def im2col(x, k=3, s=1):
+    N, H, W, C = np.shape(x)
+    H_PAD = pad(H, k, 'same', 1)
+    W_PAD = pad(W, k, 'same', 1)
+    x_pad = np.pad(x, [(0, 0), (H_PAD, H_PAD), (W_PAD, W_PAD), (0, 0)])
+    ys = []
+    for h in range(H):
+        y = []
+        for w in range(W):
+            y.append( x_pad[:, h*s : (h+k)*s, w*s : (w+k)*s, :] )
+        ys.append(y)
+    ys = np.transpose(ys, (2, 0, 1, 3, 4, 5))
+    return ys
+
+x = im2col(x)
+b, h, w, k, k, c = np.shape(x)
+x = np.reshape(x, (b, h, w, k * k * c))
+
+k, k, c, n = np.shape(f)
+f = np.reshape(f, (k * k * c, n))
+
+o = x @ f
+
+equal = np.sum(np.isclose(o, y))
+total = np.prod(np.shape(o))
+
+print( np.allclose(o, y) )
+print ( equal / total )
+
+###########################################
+
+mul = x * w
+print (np.shape(x))
+print (np.shape(w))
+print (np.shape(mul))
+    
+
+###########################################
+
+

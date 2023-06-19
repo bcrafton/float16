@@ -1,0 +1,33 @@
+
+#include <stdlib.h>
+#include <stdio.h>
+
+typedef unsigned int uint32_t;
+
+typedef struct parts_t {
+	uint32_t sign;
+	uint32_t exp;
+	uint32_t mantissa;
+} parts_t;
+ 
+parts_t parts(float val) {
+  parts_t ret;
+  uint32_t* ptr = (int*) &val;
+  ret.sign     = ((*ptr) & 0x80000000) >> 31;
+  ret.exp      = ((*ptr) & 0x7F800000) >> 23;
+  ret.mantissa = ((*ptr) & 0x007FFFFF) >> 0;
+  return ret;
+}
+
+int main() {
+  float a = 1.5;
+  uint32_t* b = (int*) &a;
+  uint32_t c = *b;
+
+  uint32_t sign     = (c & 0x80000000) >> 31;
+  uint32_t exp      = (c & 0x7F800000) >> 23;
+  uint32_t mantissa = (c & 0x007FFFFF) >> 0;
+
+  //printf("%08x %08x %08x\n", sign, exp, mantissa);
+  printf("%d %d %d\n", sign, exp, mantissa);
+}

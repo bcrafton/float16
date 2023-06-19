@@ -1,0 +1,4 @@
+*.npy
+a.out
+*.pyc
+__pycache__
